@@ -22,9 +22,7 @@ hook.Add( "OnEntityCreated", addonName, function( entity )
 
             local clip1 = math_max( weapon:Clip1(), ply:GetAmmoCount( weapon:GetPrimaryAmmoType() ) )
             if clip1 <= 0 then return end
-
             ply:StripWeapon( "weapon_rpg" )
-            weapon:Remove()
 
             weapon = ply:Give( "weapon_rpg", true )
             weapon:SetDeploySpeed( 16 )
