@@ -54,6 +54,7 @@ if SERVER then
     end )
 
     hook.Add( "WeaponEquip", addonName, function( weapon, ply )
+        if weapon:GetClass() ~= "weapon_rpg" then return end
         weapon:SetClip1( ply:GetAmmoCount( weapon:GetPrimaryAmmoType() ) )
     end )
 end
