@@ -4,8 +4,8 @@ math_max = math.max
 CurTime = CurTime
 
 AddonName = "Rocket Madness"
-reloadTime = CreateConVar( "sv_rpg_reload_time", "0.25", FCVAR_ARCHIVE, "Time to launch the next RPG rocket.", 0, 300 )
-offset = Vector( 0, 0, 3 )
+ReloadTime = CreateConVar( "mp_rpg_reload_time", "0.25", FCVAR_ARCHIVE, "Time to launch the next RPG rocket.", 0, 300 )
+Offset = Vector( 0, 0, 3 )
 
 hook.Add "OnEntityCreated", AddonName, =>
     switch @GetClass!
@@ -18,7 +18,7 @@ hook.Add "OnEntityCreated", AddonName, =>
                     return
 
                 rocket = ents.Create( "rpg_missile" )
-                rocket\SetPos( @LocalToWorld( offset ) )
+                rocket\SetPos( @LocalToWorld( Offset ) )
                 rocket\SetAngles( @GetAngles! + Angle( math.random( -30, -180 ), math.random( -180, 180 ), math.random( -30, -180 ) ) )
                 rocket\Spawn!
 
@@ -39,13 +39,13 @@ hook.Add "OnEntityCreated", AddonName, =>
                     return
 
                 clip1 = math_max( weapon\Clip1!, owner\GetAmmoCount( weapon\GetPrimaryAmmoType! ) )
-                if clip1 <= 0
+                if clip1 < 0
                     return
 
                 owner\StripWeapon( "weapon_rpg" )
 
                 weapon = owner\Give( "weapon_rpg", true )
-                weapon\SetNextPrimaryFire( CurTime! + reloadTime\GetFloat! )
+                weapon\SetNextPrimaryFire( CurTime! + ReloadTime\GetFloat! )
                 weapon\SetDeploySpeed( 16 )
                 weapon\SetClip1( clip1 )
 
