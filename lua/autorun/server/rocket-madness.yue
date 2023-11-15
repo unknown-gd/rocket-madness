@@ -1,0 +1,57 @@
+physenv_GetGravity = physenv.GetGravity
+timer_Simple = timer.Simple
+math_max = math.max
+CurTime = CurTime
+
+AddonName = "Rocket Madness"
+reloadTime = CreateConVar( "sv_rpg_reload_time", "0.25", FCVAR_ARCHIVE, "Time to launch the next RPG rocket.", 0, 300 )
+offset = Vector( 0, 0, 3 )
+
+hook.Add "OnEntityCreated", AddonName, =>
+    switch @GetClass!
+        when "item_rpg_round"
+            if math.random( 1, 10 ) ~= 2
+                return
+
+            timer_Simple math.Rand( 0, 3 ), ->
+                unless @IsValid!
+                    return
+
+                rocket = ents.Create( "rpg_missile" )
+                rocket\SetPos( @LocalToWorld( offset ) )
+                rocket\SetAngles( @GetAngles! + Angle( math.random( -30, -180 ), math.random( -180, 180 ), math.random( -30, -180 ) ) )
+                rocket\Spawn!
+
+                rocket\SetVelocity( -physenv_GetGravity! / 2 )
+
+                @Remove!
+        when "rpg_missile"
+            timer_Simple 0, ->
+                unless @IsValid!
+                    return
+
+                owner = @GetOwner!
+                unless owner\IsValid! and owner\IsPlayer! and owner\Alive!
+                    return
+
+                weapon = owner\GetWeapon( "weapon_rpg" )
+                unless weapon\IsValid!
+                    return
+
+                clip1 = math_max( weapon\Clip1!, owner\GetAmmoCount( weapon\GetPrimaryAmmoType! ) )
+                if clip1 <= 0
+                    return
+
+                owner\StripWeapon( "weapon_rpg" )
+
+                weapon = owner\Give( "weapon_rpg", true )
+                weapon\SetNextPrimaryFire( CurTime! + reloadTime\GetFloat! )
+                weapon\SetDeploySpeed( 16 )
+                weapon\SetClip1( clip1 )
+
+                owner\SelectWeapon( "weapon_rpg" )
+
+hook.Add "PlayerAmmoChanged", AddonName, ( ammoID, _, new ) =>
+    weapon = @GetActiveWeapon!
+    if weapon\IsValid! and weapon\GetClass! == "weapon_rpg" and weapon\GetPrimaryAmmoType! == ammoID
+        weapon\SetClip1( new )

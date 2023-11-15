@@ -1,0 +1,20 @@
+timer_Simple = timer.Simple
+table_remove = table.remove
+ipairs = ipairs
+
+hook.Add "OnEntityCreated", "Rocket Madness", =>
+    if @GetClass! ~= "rpg_missile"
+        return
+
+    timer_Simple 0, ->
+        unless @IsValid! and @GetOwner! == LocalPlayer!
+            return
+
+        history = GAMEMODE.PickupHistory
+        unless istable( history )
+            return
+
+        for index, item in ipairs( history )
+            if item.name == "#HL2_RPG"
+                table_remove( history, index )
+                break
