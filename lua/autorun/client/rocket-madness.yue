@@ -1,5 +1,7 @@
 timer_Simple = timer.Simple
 table_remove = table.remove
+LocalPlayer = LocalPlayer
+istable = istable
 ipairs = ipairs
 
 hook.Add "OnEntityCreated", "Rocket Madness", =>
