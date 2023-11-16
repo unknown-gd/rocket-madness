@@ -1,10 +1,13 @@
+COLLISION_GROUP_INTERACTIVE_DEBRIS = COLLISION_GROUP_INTERACTIVE_DEBRIS
 physenv_GetGravity = physenv.GetGravity
 timer_Simple = timer.Simple
 math_max = math.max
 CurTime = CurTime
 
 AddonName = "Rocket Madness"
-ReloadTime = CreateConVar( "mp_rpg_reload_time", "0.25", FCVAR_ARCHIVE, "Time to launch the next RPG rocket.", 0, 300 )
+Flags = bit.bor( FCVAR_ARCHIVE, FCVAR_NOTIFY )
+ReloadTime = CreateConVar( "mp_rpg_reload_time", "0.25", Flags, "Time to launch the next RPG rocket.", 0, 300 )
+OriginalCollisions = CreateConVar( "mp_rpg_missile_original_collisions", "0", Flags, "Use the original collision group, which means the missiles will collide with each other!", 0, 1 )
 Offset = Vector( 0, 0, 3 )
 
 hook.Add "OnEntityCreated", AddonName, =>
@@ -33,6 +36,9 @@ hook.Add "OnEntityCreated", AddonName, =>
                 owner = @GetOwner!
                 unless owner\IsValid! and owner\IsPlayer! and owner\Alive!
                     return
+
+                unless OriginalCollisions\GetBool!
+                    @SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS )
 
                 weapon = owner\GetWeapon( "weapon_rpg" )
                 unless weapon\IsValid!
